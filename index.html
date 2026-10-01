@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>𝕯𝖊𝖆𝖓'𝖘 𝖀𝖓𝖎𝖛𝖊𝖗𝖘𝖊 🍃 — Digital Artisan & Spatial Architect</title>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Fonts: Playfair Display, JetBrains Mono, & Merriweather -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+    <style>
+      :root {
+        --gold: #d6ad63;
+        --gold-bright: #f2d18a;
+        --crimson: #fc3b56;
+        --silver: #c0c0c0;
+        --bg: #050608;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        background-color: var(--bg);
+        color: #e5e5e5;
+        overflow-x: hidden;
+        cursor: default;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .font-serif-heading { font-family: 'Playfair Display', serif; }
+      .font-serif-body { font-family: 'Merriweather', serif; }
+      .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+      ::selection {
+        background: rgba(252, 59, 86, 0.4);
+        color: #ffffff;
+      }
+
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: #07080c; }
+      ::-webkit-scrollbar-thumb { background: #222530; border-radius: 3px; }
+      ::-webkit-scrollbar-thumb:hover { background: var(--crimson); }
+
+      .text-gold { color: var(--gold); }
+      .text-gold-bright { color: var(--gold-glow); }
+      .text-crimson { color: var(--crimson); }
+      
+      .hover-gold:hover {
+        color: var(--gold-bright);
+        transition: color 0.3s ease;
+      }
+
+      #canvas-container {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 1.5s ease-out;
+      }
+
+      .fade-up {
+        animation: fadeUp 1s ease-out forwards;
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      .delay-100 { animation-delay: 0.1s; }
+      .delay-200 { animation-delay: 0.2s; }
+      .delay-300 { animation-delay: 0.3s; }
+
+      @keyframes fadeUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col justify-between relative bg-[#050608]">
+    <!-- 3D WebGL Canvas Layer -->
+    <div id="canvas-container"></div>
+
+    <!-- Header Navigation -->
+    <header class="w-full max-w-[1800px] mx-auto p-6 md:p-10 grid grid-cols-2 md:grid-cols-12 gap-6 items-start z-50 relative border-b border-white/5 pb-6">
+      <!-- Logo Unit -->
+      <div class="md:col-span-3 flex flex-col fade-up">
+        <a href="#" class="font-mono text-base md:text-lg tracking-wider text-white hover:text-[#d6ad63] transition-colors duration-500 font-bold uppercase">
+          𝕯𝖊𝖆𝖓'𝖘 𝖀𝖓𝖎𝖛𝖊𝖗𝖘𝖊 <span class="text-[#fc3b56]">🍃</span>
+        </a>
+        <span class="font-mono text-[10px] text-neutral-500 uppercase tracking-widest mt-1">
+          Full-Stack & WebGL Architect
+        </span>
+      </div>
+
+      <!-- Live Operational Status -->
+      <div class="hidden md:flex md:col-span-3 flex-col gap-1.5 fade-up delay-100">
+        <span class="font-mono text-[10px] uppercase tracking-widest text-neutral-400">
+          Engine Status
+        </span>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]"></span>
+          <span class="font-serif-body text-xs text-white">
+            Available For High-End Commissions
+          </span>
+        </div>
+      </div>
+
+      <!-- Telemetry Coordinates -->
+      <div class="hidden md:flex md:col-span-3 flex-col gap-1.5 fade-up delay-200">
+        <span class="font-mono text-[10px] uppercase tracking-widest text-neutral-400">
+          Telemetry & Clock
+        </span>
+        <span class="font-mono text-xs text-white">
+          SYS // UTC+05:30
+          <span id="clock" class="text-neutral-500 ml-2 font-mono">--:--:--</span>
+        </span>
+      </div>
+
+      <!-- Interactive Wayfinding -->
+      <div class="col-span-1 md:col-span-3 flex justify-end items-start gap-8 fade-up delay-300">
+        <nav class="flex flex-col items-end gap-1.5 font-mono text-xs">
+          <a href="#work" class="group flex items-center gap-2 text-neutral-300 hover-gold transition-colors">
+            <span class="opacity-0 -translate-x-2 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 text-[#fc3b56] text-[10px]">
+              01
+            </span>
+            ARTIFACTS
+          </a>
+          <a href="#arsenal" class="group flex items-center gap-2 text-neutral-300 hover-gold transition-colors">
+            <span class="opacity-0 -translate-x-2 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 text-[#fc3b56] text-[10px]">
+              02
+            </span>
+            KINETIC ARSENAL
+          </a>
+          <a href="mailto:epicgameglider@gmail.com" class="group flex items-center gap-2 text-neutral-300 hover-gold transition-colors">
+            <span class="opacity-0 -translate-x-2 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 text-[#fc3b56] text-[10px]">
+              03
+            </span>
+            DISPATCH LINK
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Center Kinetic Hero Structure -->
+    <main class="flex-grow flex flex-col justify-center items-center relative w-full px-6 z-10 pointer-events-none my-auto">
+      <div class="relative flex flex-col items-center text-center mix-blend-screen opacity-90">
+        <span class="font-mono text-[11px] font-bold uppercase tracking-[0.4em] text-[#d6ad63] mb-4 fade-up">
+          // SPATIAL KINETICS & PURE MATHEMATICS
+        </span>
+        <h1 class="font-serif-heading text-6xl sm:text-8xl md:text-9xl lg:text-[10.5rem] font-medium tracking-tight text-white leading-[0.88] fade-up delay-100">
+          Digital
+        </h1>
+        <div class="h-6 md:h-14"></div>
+        <h1 class="font-serif-heading text-6xl sm:text-8xl md:text-9xl lg:text-[10.5rem] font-medium tracking-tight text-[#fc3b56] leading-[0.88] italic fade-up delay-200">
+          Alchemist
+        </h1>
+      </div>
+
+      <!-- Interactive Dispatch CTA -->
+      <div class="mt-12 md:mt-20 pointer-events-auto fade-up delay-300">
+        <a href="mailto:epicgameglider@gmail.com" class="group relative inline-flex items-center gap-4 px-9 py-4 border border-white/10 hover:border-[#d6ad63] rounded-full bg-black/40 backdrop-blur-md transition-all duration-500 overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
+          <span class="absolute inset-0 bg-[#d6ad63]/10 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></span>
+          <span class="font-mono text-xs uppercase text-neutral-300 group-hover:text-white relative z-10 tracking-widest font-bold">
+            Commission Spatial Build
+          </span>
+          <i data-lucide="arrow-down-right" class="w-4 h-4 text-neutral-400 group-hover:text-[#d6ad63] relative z-10 transition-colors"></i>
+        </a>
+      </div>
+    </main>
+
+    <!-- Footer System -->
+    <footer class="w-full max-w-[1800px] mx-auto p-6 md:p-10 grid grid-cols-1 md:grid-cols-4 gap-10 text-xs z-20 relative border-t border-white/5 pt-8">
+      <!-- Col 1: Bio -->
+      <div class="flex flex-col gap-3">
+        <span class="font-mono text-[10px] text-[#d6ad63] uppercase tracking-widest font-bold">// ARCHITECTURAL SPEC</span>
+        <p class="font-serif-body text-neutral-400 leading-relaxed max-w-xs text-xs">
+          Forging spatial web applications, custom GLSL shaders, and performance-tuned timeline choreographies with zero corporate bloat.
+        </p>
+      </div>
+
+      <!-- Col 2: Stack -->
+      <div class="flex flex-col gap-3 font-mono">
+        <h3 class="text-white text-xs uppercase tracking-widest font-bold">Technical Core</h3>
+        <div class="grid grid-cols-2 gap-2 text-neutral-500 text-[11px]">
+          <span>Three.js / WebGL</span>
+          <span>GSAP Kinetics</span>
+          <span>Node.js / Express</span>
+          <span>Tailwind CSS</span>
+          <span>Vanilla JS ES6+</span>
+          <span>Clean APIs</span>
+        </div>
+      </div>
+
+      <!-- Col 3: Direct Dispatches -->
+      <div class="flex flex-col gap-3 font-mono">
+        <h3 class="text-white text-xs uppercase tracking-widest font-bold">Networks</h3>
+        <div class="flex flex-col gap-2 text-neutral-400 text-[11px]">
+          <a href="https://github.com/DEANSUNIVERSE" target="_blank" class="hover:text-[#d6ad63] transition-colors flex items-center gap-2 group">
+            GitHub Repository
+            <i data-lucide="arrow-up-right" class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+          </a>
+          <a href="https://linkedin.com/in/deandev" target="_blank" class="hover:text-[#d6ad63] transition-colors flex items-center gap-2 group">
+            LinkedIn Pipeline
+            <i data-lucide="arrow-up-right" class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+          </a>
+          <a href="mailto:epicgameglider@gmail.com" class="hover:text-[#d6ad63] transition-colors flex items-center gap-2 group">
+            Direct Email
+            <i data-lucide="arrow-up-right" class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Col 4: Copyright -->
+      <div class="flex flex-col justify-end items-start md:items-end gap-1 font-mono text-neutral-500">
+        <span class="text-white font-bold text-sm tracking-wider">𝕯𝖊𝖆𝖓'𝖘 𝖀𝖓𝖎𝖛𝖊𝖗𝖘𝖊 🍃</span>
+        <span class="text-[10px] uppercase tracking-widest">
+          All Rights Reserved &copy; 2026
+        </span>
+      </div>
+    </footer>
+
+    <!-- Three.js Spatial Engine Script -->
+    <script>
+      lucide.createIcons();
+
+      // Real-Time Telemetry Clock
+      function updateClock() {
+        const now = new Date();
+        const str = now.toTimeString().split(' ')[0];
+        document.getElementById('clock').textContent = str + " IST";
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      // Three.js Interactive Setup
+      function initAlchemist() {
+        const container = document.getElementById('canvas-container');
+
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x050608, 0.0025);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 28;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // Core Geometry: Torus Knot
+        const tubularSegments = 140;
+        const radialSegments = 18;
+        const geometry = new THREE.TorusKnotGeometry(8.5, 2.4, tubularSegments, radialSegments);
+
+        // Cyber Mesh Wireframe
+        const material = new THREE.MeshPhysicalMaterial({
+          color: 0x999999,
+          emissive: 0x111622,
+          metalness: 0.95,
+          roughness: 0.15,
+          wireframe: true,
+          clearcoat: 1.0,
+          clearcoatRoughness: 0.1
+        });
+
+        const torusKnot = new THREE.Mesh(geometry, material);
+        scene.add(torusKnot);
+
+        // Kinetic Gold Sparks
+        const sparkCount = 130;
+        const sparkGeo = new THREE.CircleGeometry(0.18, 3);
+        sparkGeo.rotateY(-Math.PI / 2);
+
+        const sparkMat = new THREE.MeshBasicMaterial({
+          color: 0xd6ad63,
+          side: THREE.DoubleSide,
+          blending: THREE.AdditiveBlending,
+          transparent: true,
+          opacity: 0.85,
+          depthTest: false
+        });
+
+        const sparks = new THREE.InstancedMesh(sparkGeo, sparkMat, sparkCount);
+        torusKnot.add(sparks);
+
+        const dummy = new THREE.Object3D();
+        const sparkData = [];
+        for (let i = 0; i < sparkCount; i++) {
+          sparkData.push({
+            speed: 0.0012 + Math.random() * 0.0024,
+            progress: Math.random(),
+            pathIndex: Math.floor(Math.random() * radialSegments)
+          });
+        }
+
+        const posAttribute = geometry.attributes.position;
+        const stride = radialSegments + 1;
+        const v1 = new THREE.Vector3();
+        const v2 = new THREE.Vector3();
+
+        function updateSparks() {
+          sparkData.forEach((spark, i) => {
+            spark.progress += spark.speed;
+            if (spark.progress >= 1) spark.progress = 0;
+
+            const exactInd = spark.progress * tubularSegments;
+            const u = Math.floor(exactInd);
+            const nextU = (u + 1) % tubularSegments;
+            const v = spark.pathIndex;
+
+            const idx1 = (u * stride + v) * 3;
+            const idx2 = (nextU * stride + v) * 3;
+
+            v1.fromArray(posAttribute.array, idx1);
+            v2.fromArray(posAttribute.array, idx2);
+
+            v1.lerp(v2, exactInd - u);
+
+            dummy.position.copy(v1);
+            dummy.lookAt(v2);
+            dummy.updateMatrix();
+            sparks.setMatrixAt(i, dummy.matrix);
+          });
+          sparks.instanceMatrix.needsUpdate = true;
+        }
+
+        // Lighting Architecture
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+
+        const pointLight1 = new THREE.PointLight(0xd6ad63, 2.5, 60);
+        pointLight1.position.set(12, 14, 12);
+        scene.add(pointLight1);
+
+        const pointLight2 = new THREE.PointLight(0xfc3b56, 2, 60);
+        pointLight2.position.set(-14, -12, 10);
+        scene.add(pointLight2);
+
+        // Smooth Mouse Reactivity
+        let mouseX = 0, mouseY = 0;
+        let targetRotationX = 0, targetRotationY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+          mouseX = (e.clientX - window.innerWidth / 2) * 0.001;
+          mouseY = (e.clientY - window.innerHeight / 2) * 0.001;
+        });
+
+        function animate() {
+          requestAnimationFrame(animate);
+
+          torusKnot.rotation.y += 0.0028;
+          torusKnot.rotation.x += 0.0012;
+
+          targetRotationY = mouseX * 0.6;
+          targetRotationX = mouseY * 0.6;
+
+          torusKnot.rotation.y += 0.05 * (targetRotationY - torusKnot.rotation.y);
+          torusKnot.rotation.x += 0.05 * (targetRotationX - torusKnot.rotation.x);
+
+          updateSparks();
+          renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        setTimeout(() => {
+          container.style.opacity = '1';
+        }, 300);
+      }
+
+      window.addEventListener('DOMContentLoaded', initAlchemist);
+    </script>
+  </body>
+</html>
